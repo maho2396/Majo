@@ -1,0 +1,183 @@
+<script>
+
+  function consultar_indicadores() {
+
+    var Informacion = {}; 
+
+    Informacion.filtro_area          = document.getElementById('filtro_area').value;
+    Informacion.filtro_unidad        = document.getElementById('filtro_unidad').value;
+    Informacion.filtro_equipo        = document.getElementById('filtro_equipo').value;
+    
+    Informacion.filtro_responsable   = document.getElementById('filtro_responsable').value;
+    Informacion.filtro_nombre        = document.getElementById('filtro_nombre').value;
+    Informacion.filtro_tipo_recurso  = document.getElementById('filtro_tipo_recurso').value;
+
+    Informacion.filtro_fecha_inicio  = document.getElementById('filtro_fecha_inicio').value;
+    Informacion.filtro_fecha_fin     = document.getElementById('filtro_fecha_fin').value;
+
+    Informacion.pw_equipo            = document.getElementById('pw_equipo').innerHTML;
+    Informacion.pw_area              = document.getElementById('pw_area').innerHTML;
+    Informacion.pw_unidad            = document.getElementById('pw_unidad').innerHTML;
+    Informacion.pw_acceso            = document.getElementById('pw_acceso').innerHTML;
+
+    document.getElementById('informacion_indicadores').innerHTML = '' + 
+    '<div class = "fila col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>' +
+    '<div class = "fila">' +
+    '  <div class = "col-lg-5 col-md-5 col-sm-5 col-xs-5"></div>' +
+    '  <div class = "col-lg-5-5 col-md-5-5 col-sm-5-5 col-xs-5-5">' +
+    '    <div class = "simbolo_carga"></div>' +
+    '  </div>' +
+    '</div>';
+    
+    google.script.run.withSuccessHandler( 
+      (Informacion) => {
+        document.getElementById("informacion_indicadores").innerHTML = Informacion.Consulta;
+
+        document.getElementById("listado_areas").innerHTML = Informacion.opciones_areas;
+        document.getElementById("listado_unidades").innerHTML = Informacion.opciones_unidades;
+        document.getElementById("listado_equipos").innerHTML = Informacion.opciones_equipos;
+
+        document.getElementById("listado_responsables").innerHTML = Informacion.opciones_responsables;
+        document.getElementById("listado_nombres").innerHTML = Informacion.opciones_nombres;
+        document.getElementById("listado_tipos_recursos").innerHTML = Informacion.opciones_tipos_recursos;
+
+      }).consultar_indicadores(Informacion);
+  }
+
+  function modificar_indicadores(id) {
+    var Informacion = {};
+
+    espera_notificacion('Espere un momento por favor');
+    window.scrollTo(0, 0);
+
+    Informacion.id              = id;
+
+    Informacion.pw_equipo       = document.getElementById('pw_equipo').innerHTML;
+    Informacion.pw_area         = document.getElementById('pw_area').innerHTML;
+    Informacion.pw_unidad       = document.getElementById('pw_unidad').innerHTML;
+
+    Informacion.pw_usuario      = document.getElementById('pw_usuario').innerHTML;
+
+    google.script.run.withSuccessHandler(
+
+      (Informacion) => {
+        document.getElementById('pw_notificacion').innerHTML = Informacion.ventana;
+
+      }).modificar_indicadores(Informacion);
+
+  }
+
+  function guardar_modificar_indicadores(){
+    var Informacion = {};
+    Informacion.id_registro        = document.getElementById('id_registro').innerHTML;
+
+    Informacion.area               = document.getElementById('area').value;
+    Informacion.unidad             = document.getElementById('unidad').value;
+    Informacion.equipo             = document.getElementById('equipo').value;
+
+    Informacion.nombre             = document.getElementById('nombre').value;
+    Informacion.descripcion        = document.getElementById('descripcion').value;
+
+    Informacion.fecha_creacion     = document.getElementById('fecha_creacion').value;
+    Informacion.fecha_modificacion = document.getElementById('fecha_modificacion').value;
+
+    Informacion.responsable        = document.getElementById('responsable').value;
+    Informacion.tipo_recurso       = document.getElementById('tipo_recurso').value;
+
+    Informacion.link_carpeta       = document.getElementById('link_carpeta').value;
+    Informacion.link_ppt           = document.getElementById('link_ppt').value;
+    Informacion.link_excel         = document.getElementById('link_excel').value;
+    Informacion.link_tablero       = document.getElementById('link_tablero').value;
+    Informacion.link_documento     = document.getElementById('link_documento').value;
+    Informacion.link_video         = document.getElementById('link_video').value;
+    Informacion.link_site          = document.getElementById('link_site').value;
+    
+    if (Informacion.id_registro    == "[Por crear]") {Informacion.id_registro = "";}
+    
+    if (Informacion.area           != "") {Informacion.area = Informacion.area.trim();}
+    if (Informacion.unidad         != "") {Informacion.unidad = Informacion.unidad.trim();}
+    if (Informacion.equipo         != "") {Informacion.equipo = Informacion.equipo.trim();}
+
+    if (Informacion.nombre         != "") {Informacion.nombre = Informacion.nombre.trim();}
+    if (Informacion.descripcion    != "") {Informacion.descripcion = Informacion.descripcion.trim();}
+
+    if (Informacion.responsable    != "") {Informacion.responsable = Informacion.responsable.trim();}
+    if (Informacion.tipo_recurso   != "") {Informacion.tipo_recurso = Informacion.tipo_recurso.trim();}
+
+    if (Informacion.link_carpeta   != "") {Informacion.link_carpeta = Informacion.link_carpeta.trim();}
+    if (Informacion.link_ppt       != "") {Informacion.link_ppt = Informacion.link_ppt.trim();}
+    if (Informacion.link_excel     != "") {Informacion.link_excel = Informacion.link_excel.trim();}
+    if (Informacion.link_tablero   != "") {Informacion.link_tablero = Informacion.link_tablero.trim();}
+    if (Informacion.link_documento != "") {Informacion.link_documento = Informacion.link_documento.trim();}
+    if (Informacion.link_video     != "") {Informacion.link_video = Informacion.link_video.trim();}
+    if (Informacion.link_site      != "") {Informacion.link_site = Informacion.link_site.trim();}
+
+    if (Informacion.area == "") {
+      document.getElementById('alerta_guardar_inf').innerHTML = 'Completar "Área"';
+      document.getElementById('alerta_guardar_inf').style.color = "#DA3851";
+      return;
+    }
+    if (Informacion.unidad == "") {
+      document.getElementById('alerta_guardar_inf').innerHTML = 'Completar "Unidad"';
+      document.getElementById('alerta_guardar_inf').style.color = "#DA3851";
+      return;
+    }
+    if (Informacion.equipo == "") {
+      document.getElementById('alerta_guardar_inf').innerHTML = 'Completar "Equipo"';
+      document.getElementById('alerta_guardar_inf').style.color = "#DA3851";
+      return;
+    }
+
+    if (Informacion.nombre == "") {
+      document.getElementById('alerta_guardar_inf').innerHTML = 'Completar "Nombre"';
+      document.getElementById('alerta_guardar_inf').style.color = "#DA3851";
+      return;
+    }
+    if (Informacion.descripcion == "") {
+      document.getElementById('alerta_guardar_inf').innerHTML = 'Completar "Descripción"';
+      document.getElementById('alerta_guardar_inf').style.color = "#DA3851";
+      return;
+    }
+
+    if (Informacion.responsable == "") {
+      document.getElementById('alerta_guardar_inf').innerHTML = 'Completar "Responsable"';
+      document.getElementById('alerta_guardar_inf').style.color = "#DA3851";
+      return;
+    }
+    if (Informacion.tipo_recurso == "") {
+      document.getElementById('alerta_guardar_inf').innerHTML = 'Completar "Tipo Recurso"';
+      document.getElementById('alerta_guardar_inf').style.color = "#DA3851";
+      return;
+    }
+
+
+    document.getElementById('alerta_guardar_inf').innerHTML = 'Información cargada correctamente';
+    document.getElementById('alerta_guardar_inf').style.color = "#48AE64";
+
+    google.script.run.withSuccessHandler(
+      (Informacion) => {
+        document.getElementById('pw_notificacion').innerHTML = "";
+        consultar_indicadores();
+        window.scrollTo(0, 0);
+
+      }).guardar_modificar_indicadores(Informacion);
+  };
+
+
+  function eliminar_indicadores() {
+    
+    var Informacion = {};
+
+    Informacion.id_registro = document.getElementById('id_registro').innerHTML;
+    document.getElementById('alerta_guardar_inf').innerHTML = 'Eliminando información...';
+    document.getElementById('alerta_guardar_inf').style.color = "#DA3851";
+
+    google.script.run.withSuccessHandler(
+      (Informacion) => {
+        document.getElementById('pw_notificacion').innerHTML = "";
+        consultar_indicadores();
+        window.scrollTo(0, 0);
+      }).eliminar_indicadores(Informacion);
+  }
+
+</script>
