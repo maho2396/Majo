@@ -1,0 +1,234 @@
+<script>
+  window.addEventListener('load', procedimientos_iniciales);
+
+  function procedimientos_iniciales() {
+    google.script.run.withSuccessHandler(loadAccessType).getAccessType();
+    return;
+  };
+
+  function loadAccessType(AccessType) {
+    if (AccessType.nombre == "No identificado") { AccessType.nombre = "";}
+    if (AccessType.nombre != "") {
+      document.getElementById('pw_usuario').innerHTML       = AccessType.nombre;
+    } else {
+      document.getElementById('pw_usuario').innerHTML       = AccessType.correo;
+    }
+    document.getElementById('pw_acceso').innerHTML        = AccessType.acceso;
+    document.getElementById('pw_correo').innerHTML        = AccessType.correo;
+    document.getElementById('pw_nombre').innerHTML        = AccessType.nombre_completo;
+    document.getElementById('pw_unidad').innerHTML        = AccessType.unidad;
+    document.getElementById('pw_area').innerHTML          = AccessType.area;
+    document.getElementById('pw_equipo').innerHTML        = AccessType.equipo;
+    document.getElementById('pw_acceso_oculto').innerHTML = AccessType.acceso;
+
+    cargarContenedor("Inicio");  
+    
+    
+    return;
+  };
+
+  function actualizarDiv(html) {
+    document.getElementById('contenedor_principal').innerHTML = html; 
+    window.scrollTo(0, 0);
+    return;
+  }
+
+  function generar_notificacion(mensaje) {
+    document.getElementById('pw_notificacion').innerHTML = '' +
+      '<div class="col-lg-2-5 col-md-2 col-sm-1-5 col-xs-1-5"></div>' +
+      '<div class="col-lg-7 col-md-8 col-sm-9 col-xs-9" style = "padding: 0px;">' +
+      '  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>' +
+      '  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 navegador4">' +
+      '    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">' +
+      '      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>' +
+      '      <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"></div>' +
+      '      <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10" style = "font-size:12px;padding: 3px;">' + mensaje + '</div>' +
+      '      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>' +
+      '      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4"></div>' +
+      '      <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">' +
+      '        <button onclick = "limpiar_notificacion();"' + 
+      '                class = "col-lg-12 col-md-12 col-sm-12 col-xs-12 button texto_centrado"' +
+      '                style = "border-radius: 4px 4px 4px 4px;"' +
+      '                id = "id_limpiar_notificacion">' +
+      '          <b>Aceptar</b>' +
+      '        </button>' +
+      '      </div>' +
+      '      <div id = "alerta_guardar_inf" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"' + 
+      '      style = "font-size:12px;padding: 3px;"></div>' +
+      '    </div>' +
+      '  </div>' +
+      '</div>';
+    return;
+  };
+
+  function espera_notificacion(mensaje) {
+    document.getElementById('pw_notificacion').innerHTML = '' +
+      '<div class="col-lg-2-5 col-md-2 col-sm-1-5 col-xs-1-5"></div>' +
+      '<div class="col-lg-7 col-md-8 col-sm-9 col-xs-9" style = "padding: 0px;">' +
+      '  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>' +
+      '  <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 navegador4">' +
+      '    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">' +
+      '      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>' +
+      '      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12" style = "font-size:12px;padding: 3px;">' + mensaje + '</div>' +
+      '      <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12"></div>' +
+      '      <div class="col-lg-5-5 col-md-5-5 col-sm-5-5 col-xs-5-5"></div>' +
+      '      <div class="col-lg-5 col-md-5 col-sm-5 col-xs-5">' +
+      '        <div class = "simbolo_carga_pequeño"></div>' +
+      '      </div>' +
+      '      <div id = "alerta_guardar_inf" class="col-lg-12 col-md-12 col-sm-12 col-xs-12"' + 
+      '      style = "font-size:12px;padding: 3px;"></div>' +
+      '    </div>' +
+      '  </div>' +
+      '</div>';
+    return;
+  };
+
+  function limpiar_notificacion() {
+    document.getElementById('pw_notificacion').innerHTML = "";
+    return;
+  };
+
+  function limpiar_guia() {
+    document.getElementById('pw_guia').innerHTML = "";
+    return;
+  };
+
+
+  
+  function contador_ingresos(nombre_elemento) {
+    var Informacion = {};
+    Informacion.nombre_elemento = nombre_elemento;
+    
+    google.script.run.withSuccessHandler(
+      (Informacion) => {
+
+        //document.getElementById('filtro_ciclo_actual').value = Informacion.ciclo_actual;
+        
+      }).contador_ingresos(Informacion);
+  }
+
+  function cargar_pagina_web(pag_web) {
+    window.open(pag_web, '_blank'); 
+  }
+  
+  function cargarContenedor(html) {
+
+    var tipo_acceso = document.getElementById('pw_acceso').innerHTML;
+    
+    if (tipo_acceso == "Acceso consulta") {
+
+      if (html == 'Inicio' ||
+
+          html == 'Perfil'
+
+          ) {
+      } else { 
+        generar_notificacion('Lo sentimos, usted no cuenta con permisos para poder acceder a esta sección. Si necesita modificar su tipo de acceso, por favor comunicarse con Risk Transformation');
+        return;
+      };
+
+
+    } else if (tipo_acceso == "Acceso Esquivias") {
+
+      if (html == 'Inicio' ||
+
+          html == 'Perfil' ||
+          html == 'Indicadores' 
+          
+          ) {
+      } else { 
+        generar_notificacion('Lo sentimos, usted no cuenta con permisos para poder acceder a esta sección. Si necesita modificar su tipo de acceso, por favor comunicarse con Risk Transformation');
+        return;
+      };
+
+    } else {html = 'Inicio';};
+    
+    
+
+    var value_scroll = 0;
+
+    google.script.run.withSuccessHandler(
+      (value_contenedor) => {
+        document.getElementById('contenedor_principal').innerHTML = value_contenedor;
+        window.scrollTo(0, value_scroll);
+
+        var tipo_acceso = document.getElementById('pw_acceso').innerHTML;
+        var correo = document.getElementById('pw_correo').innerHTML;
+
+        if (html == "Inicio") {
+
+
+        } else if (html == "Perfil") {
+
+          google.script.run.withSuccessHandler((Informacion) => {
+            document.getElementById('correo').value = Informacion.correo;
+            document.getElementById('nombre').value = Informacion.nombre;
+            document.getElementById('nombre_completo').value = Informacion.nombre_completo;
+            document.getElementById('registro').value = Informacion.registro;
+            document.getElementById('area').value = Informacion.area;
+            document.getElementById('unidad').value = Informacion.unidad;
+            document.getElementById('equipo').value = Informacion.equipo;
+            document.getElementById('acceso').value = Informacion.acceso;
+
+            if (Informacion.nombre_completo != ""){ document.getElementById('nombre_completo').disabled = true; }
+            if (Informacion.registro != ""){ document.getElementById('registro').disabled = true; }
+            
+          }).capturar_informacion();
+
+        } else if (html == "Indicadores") {
+          consultar_indicadores();
+
+        }
+        
+
+        
+
+
+      }
+    ).include(html);
+  }
+
+
+
+
+
+
+
+  function getFiles_Mod(id,id_url,id_folder,proc) {
+    document.getElementById(id_url).value = 'Cargando...';
+    const f = document.getElementById(id);
+    [...f.files].forEach((file, i) => {
+      const fr = new FileReader();
+      fr.onload = (e) => {const data = e.target.result.split(",");
+      const obj = {fileName: f.files[i].name, mimeType: data[0].match(/:(\w.+);/)[1], data: data[1],folder: id_folder,proceso: proc};
+      google.script.run.withSuccessHandler((InfFile) => {
+          document.getElementById(id_url).value = InfFile.url;
+        }
+      ).saveFile(obj);};
+      fr.readAsDataURL(file);
+    });
+  };
+
+
+
+
+  function mostrar_ocultar_tabla (nombre_tabla) {
+    if (document.getElementById(nombre_tabla).style.display == "none") {
+      document.getElementById(nombre_tabla).style.display = "table";
+    } else {
+      document.getElementById(nombre_tabla).style.display = "none";
+    }
+  }
+
+  function mostrar_ocultar_fila_tabla (nombre_tabla) {
+    if (document.getElementById(nombre_tabla).style.display == "none") {
+      document.getElementById(nombre_tabla).style.display = "table-row";
+    } else {
+      document.getElementById(nombre_tabla).style.display = "none";
+    }
+  }
+
+
+  
+
+</script>
