@@ -176,3 +176,5 @@ function contador_ingresos(Informacion) {
 
   return;
 }
+
+
