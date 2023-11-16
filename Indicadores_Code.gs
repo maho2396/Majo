@@ -1,12 +1,8 @@
-function consultar_indicadores(Informacion) {
+function consultar_indicadores_drive(Informacion) {
 
-  var filtro_area         = Informacion.filtro_area;
-  var filtro_unidad       = Informacion.filtro_unidad;
-  var filtro_equipo       = Informacion.filtro_equipo;
-
-  var filtro_responsable  = Informacion.filtro_responsable;
   var filtro_nombre       = Informacion.filtro_nombre;
-  var filtro_tipo_recurso = Informacion.filtro_tipo_recurso;
+  var filtro_correo       = Informacion.filtro_correo;
+  var filtro_carro        = Informacion.filtro_carro;
 
   var filtro_fecha_inicio = Informacion.filtro_fecha_inicio;
   var filtro_fecha_fin    = Informacion.filtro_fecha_fin;
@@ -17,133 +13,91 @@ function consultar_indicadores(Informacion) {
   var pw_acceso           = Informacion.pw_acceso;
 
   var fc = new Date();
-  var text_fc = Utilities.formatDate(fc, "GMT-5", "yyyy-MM-dd' 'HH:mm:ss' '");
+  var text_fc = Utilities.formatDate(fc, "GMT1", "yyyy-MM-dd' 'HH:mm:ss' '");
   var fc_actual = text_fc.substring(8, 10) + '/' + text_fc.substring(5, 7) + '/' + text_fc.substring(0, 4) + ' ' + text_fc.substring(11, 19);
   var id_fecha = text_fc.substring(0, 4) + ' - ' + text_fc.substring(5, 7) + ' - ' + text_fc.substring(8, 10);
 
-  var id = SpreadsheetApp.openById("17aal0VWKR_q7jUDjNhzPFH_ihpUDXGLeue-cSspJ_T4");
+  var id = SpreadsheetApp.openById("1PKqc-p7DuQ1-yEy-0mloQiIlbIa8MTQwHEqvOfelbas");
   var ss = id.getSheetByName("Base");
   var data = ss.getRange(1, 1, ss.getRange("A1").getDataRegion().getLastRow(), ss.getLastColumn()).getValues();
 
+  data.sort((a, b) => a[2].localeCompare(b[2])); //Ordenar según nombre
 
-  data.sort((a, b) => a[6].localeCompare(b[5])); //Ordenar según nombre
-  data.sort((a, b) => a[4].localeCompare(b[4])); //Ordenar según equipo
-  data.sort((a, b) => a[3].localeCompare(b[3])); //Ordenar según sub unidad
-  data.sort((a, b) => a[2].localeCompare(b[2])); //Ordenar según unidad
-
-  Informacion.Consulta = '' +
+  Informacion.tabla_consulta = '' +
   '<table>' + 
   '  <tr>' + 
-  '    <th>Unidad</th>' + 
-  '    <th>Equipo</th>' + 
+  '    <th>Fecha registro</th>' + 
+  '    <th>Correo</th>' + 
   '    <th>Nombre</th>' + 
-  '    <th>Responsable</th>' + 
-  '    <th>Fecha creación</th>' + 
-  '    <th>Tipo de recurso</th>' + 
-  '    <th>Enlaces</th>' + 
+  '    <th>Dirección</th>' + 
+  '    <th>Carro</th>' + 
+  '    <th>Capacidad</th>' + 
   '    <th style = "width:10px;"></th>' + 
   '  </tr>' +
   '  <tr>' + 
   '  </tr>';
 
-
-  var cond_unidad = "";
-
-  var conjuntoAreas = [];
-  var conjuntoUnidades = [];
-  var conjuntoEquipos = [];
-  var conjuntoResponsables = [];
   var conjuntoNombres = [];
-  var conjuntoTiposRecursos = [];
+  var conjuntoCorreos = [];
+  var conjuntoCarros = [];
 
-  conjuntoAreas.push("Riesgos");
-  conjuntoUnidades.push("Retail Credit");
-  conjuntoUnidades.push("Wholesale Credit");
-  conjuntoUnidades.push("Collection, Mitigation & Workout");
-  conjuntoUnidades.push("Non Financial Risk");
-  conjuntoUnidades.push("Risk Transformation");
-  conjuntoUnidades.push("Portfolio Management, Data & Reporting");
-  conjuntoUnidades.push("Market, Structural & Fiduciary Risk");
-  conjuntoUnidades.push("Risk Internal Control");
-  conjuntoUnidades.push("Risk Solution Group");
+  conjuntoCarros.push("Nissan");
 
   var contador_total = 0;
+  var capacidad_total = 0;
 
   for (var i = 0; i < data.length; i++) {
      
-    var id                   = data[i][0];
-    var estado               = data[i][1];
-    var area                 = data[i][2];
-    var unidad               = data[i][3];
-    var equipo               = data[i][4];
-    var nombre               = data[i][5];
-    var descripcion          = data[i][6];
-    var fecha_creacion       = data[i][7];
-    var fecha_modificacion   = data[i][8];
-    var responsable          = data[i][9];
-    var tipo_recurso         = data[i][10];
-    var link_carpeta         = data[i][11];
-    var link_ppt             = data[i][12];
-    var link_excel           = data[i][13];
-    var link_tablero         = data[i][14];
-    var link_documento       = data[i][15];
-    var link_video           = data[i][16];
-    var link_site            = data[i][17];
+    var fecha_registro      = data[i][0];
+    var correo              = data[i][1];
+    var nombre              = data[i][2];
+    var direccion           = data[i][3];
+    var carro               = data[i][4];
+    var capacidad           = data[i][5];
     
     var validar = true;
 
-    if (id == "ID" || estado == "Backlog" || estado == "Cancelado" || estado == "Apagado" || estado == "Proximamente"){
+    //Alimenta los filtros
+    if (fecha_registro == "Timestamp") {
       validar = false;
     } else {
-      if (conjuntoAreas.includes(area) == false) {
-        conjuntoAreas.push(area);
-      }
-      if (conjuntoUnidades.includes(unidad) == false) {
-        conjuntoUnidades.push(unidad);
-      }
-      if (conjuntoEquipos.includes(equipo) == false) {
-        conjuntoEquipos.push(equipo);
-      }
-      if (conjuntoResponsables.includes(responsable) == false) {
-        conjuntoResponsables.push(responsable);
-      }
       if (conjuntoNombres.includes(nombre) == false) {
         conjuntoNombres.push(nombre);
       }
-      if (conjuntoTiposRecursos.includes(tipo_recurso) == false) {
-        conjuntoTiposRecursos.push(tipo_recurso);
+      if (conjuntoCorreos.includes(correo) == false) {
+        conjuntoCorreos.push(correo);
       }
-
-
+      if (conjuntoCarros.includes(carro) == false) {
+        conjuntoCarros.push(carro);
+      }
     }
+    
 
-    if (filtro_area == ""){} else { 
-      if (area.toString().toUpperCase().indexOf(filtro_area.toString().toUpperCase()) > -1) {}else{validar = false;} 
+
+    if (filtro_nombre != ""){ 
+      if (nombre.toString().toUpperCase().indexOf(filtro_nombre.toString().toUpperCase()) == -1) { 
+        validar = false;
+      } 
     };
-    if (filtro_unidad == ""){} else { 
-      if (unidad.toString().toUpperCase().indexOf(filtro_unidad.toString().toUpperCase()) > -1) {}else{validar = false;} 
+    if (filtro_correo != ""){ 
+      if (correo.toString().toUpperCase().indexOf(filtro_correo.toString().toUpperCase()) == -1) { 
+        validar = false;
+      } 
     };
-    if (filtro_equipo == ""){} else { 
-      if (equipo.toString().toUpperCase().indexOf(filtro_equipo.toString().toUpperCase()) > -1) {}else{validar = false;} 
-    };
-    if (filtro_responsable == ""){} else { 
-      if (responsable.toString().toUpperCase().indexOf(filtro_responsable.toString().toUpperCase()) > -1) {}else{validar = false;} 
-    };
-    if (filtro_nombre == ""){} else { 
-      if (nombre.toString().toUpperCase().indexOf(filtro_nombre.toString().toUpperCase()) > -1) {}else{validar = false;} 
-    };
-    if (filtro_tipo_recurso == ""){} else { 
-      if (tipo_recurso.toString().toUpperCase().indexOf(filtro_tipo_recurso.toString().toUpperCase()) > -1) {}else{validar = false;} 
+    if (filtro_carro != ""){ 
+      if (carro.toString().toUpperCase().indexOf(filtro_carro.toString().toUpperCase()) == -1) { 
+        validar = false;
+      } 
     };
 
     if (filtro_fecha_inicio != "") {
-      if (fecha_creacion == "") {
+      if (fecha_registro == "") {
         validar = false;
       } else {
-        var fecha_inicio_time          = new Date(filtro_fecha_inicio).getTime();
-        var marca_temporal_time = new Date(fecha_creacion).getTime();
+        var fecha_inicio_time = new Date(filtro_fecha_inicio).getTime();
+        var fecha_fin_time    = new Date(fecha_registro).getTime();
         
-        var diff = marca_temporal_time - fecha_inicio_time;
+        var diff = fecha_fin_time - fecha_inicio_time;
         var diff = diff / (1000*60*60*24);// (1000*60*60*24) --> milisegundos -> segundos -> minutos -> horas -> días
 
         if (diff <= 0) {validar = false;}
@@ -151,13 +105,13 @@ function consultar_indicadores(Informacion) {
     }
 
     if (filtro_fecha_fin != "") {
-      if (fecha_creacion == "") {
+      if (fecha_registro == "") {
         validar = false;
       } else {
-        var fecha_fin_time          = new Date(filtro_fecha_fin).getTime();
-        var marca_temporal_time = new Date(fecha_creacion).getTime();
+        var fecha_fin_time    = new Date(filtro_fecha_fin).getTime();
+        var fecha_inicio_time = new Date(fecha_registro).getTime();
         
-        var diff = fecha_fin_time - marca_temporal_time;
+        var diff = fecha_fin_time - fecha_inicio_time;
         var diff = diff / (1000*60*60*24);// (1000*60*60*24) --> milisegundos -> segundos -> minutos -> horas -> días
 
         if (diff + 1 < 0) {validar = false;}
@@ -165,105 +119,26 @@ function consultar_indicadores(Informacion) {
     }
 
     if (validar == true) {
+      
+      capacidad_total = (capacidad_total * 1) + (capacidad * 1);
 
-      if (area         == ""){area = "[Sin identificar]"}
-      if (unidad       == ""){unidad = "[Sin identificar]"}
-      if (equipo       == ""){equipo = "[Sin identificar]"}
-
-      if (responsable  == ""){responsable = "[Sin identificar]"}
-      if (nombre       == ""){nombre = "[Sin identificar]"}
-      if (tipo_recurso == ""){tipo_recurso = "[Sin identificar]"}
-
-      if (cond_unidad == "") {
-      } else if (cond_unidad == unidad) {
-      } else {
-        Informacion.Consulta = Informacion.Consulta +
-        '<tr>' +
-        '  <td colspan = "8" style = "padding:0px;height: 12px;background-color: #BDBDBD;"></td>' +
-        '</tr>';
-      }
-      var cond_unidad = unidad;
-
-      if (fecha_creacion != "") {
-        var fc = new Date(fecha_creacion);
-        var text_fc = Utilities.formatDate(fc, "GMT-5", "yyyy-MM-dd' 'HH:mm:ss' '");
-        var fecha_creacion = text_fc.substring(8, 10) +'/'+ text_fc.substring(5, 7) +'/'+ text_fc.substring(0, 4);
+      if (fecha_registro != "") {
+        var fc = new Date(fecha_registro);
+        var text_fc = Utilities.formatDate(fc, "GMT1", "yyyy-MM-dd' 'HH:mm:ss' '");
+        var fecha_registro = text_fc.substring(8, 10) +'/'+ text_fc.substring(5, 7) +'/'+ text_fc.substring(0, 4);
       }; 
 
-      var enlaces = "";
-      if (link_carpeta != "") {
-        enlaces = enlaces + 
-        '<div class = "informativo_pequeno_azul_navy col-lg-aut col-md-aut col-sm-aut col-xs-aut"' +
-        '     onclick = "cargar_pagina_web_libre(' + "'" + link_carpeta + "'" + ')"' +
-        '     title = "Carpeta" style = "cursor: pointer;">' + 
-        '  <i class="material-icons" style = "font-size:18px;padding: 0px">folder_open</i>' +
-        '</div>';
-      }
-
-      if (link_ppt != "") {
-        enlaces = enlaces + 
-        '<div class = "informativo_pequeno_naranja col-lg-aut col-md-aut col-sm-aut col-xs-aut"' +
-        '     onclick = "cargar_pagina_web_libre(' + "'" + link_ppt + "'" + ')"' +
-        '     title = "Presentación" style = "cursor: pointer;">' + 
-        '  <i class="material-icons" style = "font-size:18px;padding: 0px">branding_watermark</i>' +
-        '</div>';
-      }
-
-      if (link_excel != "") {
-        enlaces = enlaces + 
-        '<div class = "informativo_pequeno_verde col-lg-aut col-md-aut col-sm-aut col-xs-aut"' +
-        '     onclick = "cargar_pagina_web_libre(' + "'" + link_excel + "'" + ')"' +
-        '     title = "Excel" style = "cursor: pointer;">' + 
-        '  <i class="material-icons" style = "font-size:18px;padding: 0px">description</i>' +
-        '</div>';
-      }
-
-      if (link_tablero != "") {
-        enlaces = enlaces + 
-        '<div class = "informativo_pequeno_aqua_medium col-lg-aut col-md-aut col-sm-aut col-xs-aut"' +
-        '     onclick = "cargar_pagina_web_libre(' + "'" + link_tablero + "'" + ')"' +
-        '     title = "Tablero" style = "cursor: pointer;">' + 
-        '  <i class="material-icons" style = "font-size:18px;padding: 0px">dashboard</i>' +
-        '</div>';
-      }
-
-      if (link_documento != "") {
-        enlaces = enlaces + 
-        '<div class = "informativo_pequeno_medium_blue col-lg-aut col-md-aut col-sm-aut col-xs-aut"' +
-        '     onclick = "cargar_pagina_web_libre(' + "'" + link_documento + "'" + ')"' +
-        '     title = "Documento" style = "cursor: pointer;">' + 
-        '  <i class="material-icons" style = "font-size:18px;padding: 0px">description</i>' +
-        '</div>';
-      }
-
-      if (link_video != "") {
-        enlaces = enlaces + 
-        '<div class = "informativo_pequeno_rojo col-lg-aut col-md-aut col-sm-aut col-xs-aut"' +
-        '     onclick = "cargar_pagina_web_libre(' + "'" + link_video + "'" + ')"' +
-        '     title = "Video" style = "cursor: pointer;">' + 
-        '  <i class="material-icons" style = "font-size:18px;padding: 0px">video_library</i>' +
-        '</div>';
-      }
-
-      if (link_site != "") {
-        enlaces = enlaces + 
-        '<div class = "informativo_pequeno_sand col-lg-aut col-md-aut col-sm-aut col-xs-aut"' +
-        '     onclick = "cargar_pagina_web_libre(' + "'" + link_site + "'" + ')"' +
-        '     title = "Site" style = "cursor: pointer;">' + 
-        '  <i class="material-icons" style = "font-size:18px;padding: 0px">tv</i>' +
-        '</div>';
-      }
-        
-
-      Informacion.Consulta = Informacion.Consulta +
+      Informacion.tabla_consulta = Informacion.tabla_consulta +
       '<tr>' +
-      '  <td>' + unidad + '</td>' +
-      '  <td>' + equipo + '</td>' +
+      '  <td>' + fecha_registro + '</td>' +
+      '  <td>' + correo + '</td>' +
       '  <td>' + nombre + '</td>' +
-      '  <td>' + responsable + '</td>' +
-      '  <td>' + fecha_creacion + '</td>' +
-      '  <td>' + tipo_recurso + '</td>' +
-      '  <td>' + enlaces + '</td>' +
+      '  <td>' + direccion + '</td>' +
+      '  <td>' + carro + '</td>' +
+      '  <td>' + capacidad + '</td>' +
+      '  <td></td>';
+      
+      /*
       '  <td>' + 
       '    <div class = "informativo_pequeno_gris_boton col-lg-aut col-md-aut col-sm-aut col-xs-aut"' +
       '         onclick = "mostrar_ocultar_fila_tabla(' + "'fila_indicadores_" + id + "'" + ')"' + 
@@ -271,79 +146,43 @@ function consultar_indicadores(Informacion) {
       '      <i class="material-icons" style = "font-size:18px;padding: 0px">unfold_more</i>' +
       '    </div>' +
       '  </td>';
-      
-      if (pw_acceso == "Acceso Risk Transformation" ||
-          pw_acceso == "Administrador") {
-
-      Informacion.Consulta = Informacion.Consulta + 
-      '  <td style = "background-color: white;border: 1px solid white;">' + 
-      '    <div class = "informativo_pequeno_azul_boton col-lg-aut col-md-aut col-sm-aut col-xs-aut"' +
-      '         onclick = "modificar_indicadores(' + "'" + id + "'" + ')"' +
-      '         title = "Editar registro" style = "cursor: pointer;">' + 
-      '      <i class="material-icons" style = "font-size:18px;padding: 0px">create</i>' +
-      '    </div>' +
-      '  </td>';
-      
-      }
-
-      Informacion.Consulta = Informacion.Consulta + 
-      '</tr>' +
-      '<tr style = "display:none;">' +
-      '</tr>' +
-      '<tr id = "fila_indicadores_' + id + '" style = "display:none;">' +
-      '  <td>Descripción</td>' +
-      '  <td colspan = "7">' + descripcion + '</td>' +
-      '</tr>';
+      */
 
       contador_total = contador_total + 1;
 
     } 
   }
 
-  conjuntoAreas.sort();
-  conjuntoUnidades.sort();
-  conjuntoEquipos.sort();
-  conjuntoResponsables.sort();
   conjuntoNombres.sort();
-  conjuntoTiposRecursos.sort();
-
+  conjuntoCorreos.sort();
+  conjuntoCarros.sort();
   
 
-  var opciones_areas = ""
-  for (var u = 0; u < conjuntoAreas.length; u++) {
-    opciones_areas = opciones_areas + '<option value="' + conjuntoAreas[u] + '">';
-  }
-  var opciones_unidades = ""
-  for (var u = 0; u < conjuntoUnidades.length; u++) {
-    opciones_unidades = opciones_unidades + '<option value="' + conjuntoUnidades[u] + '">';
-  }
-  var opciones_equipos = ""
-  for (var u = 0; u < conjuntoEquipos.length; u++) {
-    opciones_equipos = opciones_equipos + '<option value="' + conjuntoEquipos[u] + '">';
-  }
-  var opciones_responsables = ""
-  for (var u = 0; u < conjuntoResponsables.length; u++) {
-    opciones_responsables = opciones_responsables + '<option value="' + conjuntoResponsables[u] + '">';
-  }
   var opciones_nombres = ""
   for (var u = 0; u < conjuntoNombres.length; u++) {
     opciones_nombres = opciones_nombres + '<option value="' + conjuntoNombres[u] + '">';
   }
-  var opciones_tipos_recursos = ""
-  for (var u = 0; u < conjuntoTiposRecursos.length; u++) {
-    opciones_tipos_recursos = opciones_tipos_recursos + '<option value="' + conjuntoTiposRecursos[u] + '">';
+  var opciones_correos = ""
+  for (var u = 0; u < conjuntoCorreos.length; u++) {
+    opciones_correos = opciones_correos + '<option value="' + conjuntoCorreos[u] + '">';
+  }
+  var opciones_carros = ""
+  for (var u = 0; u < conjuntoCarros.length; u++) {
+    opciones_carros = opciones_carros + '<option value="' + conjuntoCarros[u] + '">';
   }
   
-
-  Informacion.opciones_areas = opciones_areas;
-  Informacion.opciones_unidades = opciones_unidades;
-  Informacion.opciones_equipos = opciones_equipos;
-  Informacion.opciones_responsables = opciones_responsables;
+  
   Informacion.opciones_nombres = opciones_nombres;
-  Informacion.opciones_tipos_recursos = opciones_tipos_recursos;
+  Informacion.opciones_correos = opciones_correos;
+  Informacion.opciones_carros = opciones_carros;
 
-  Informacion.Consulta = Informacion.Consulta + '</table>';
+  Informacion.tabla_consulta = Informacion.tabla_consulta + '</table>';
 
+  capacidad_total = (Math.round(capacidad_total * 10000))/10000;
+  capacidad_total = capacidad_total * 100;
+  capacidad_total = capacidad_total + " %"; 
+
+  Informacion.tabla_consulta = "Total capacidad: " + capacidad_total + "<br><br>" + Informacion.tabla_consulta;
 
   return Informacion;
 };
