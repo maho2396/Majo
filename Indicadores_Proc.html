@@ -24,20 +24,20 @@
     '    <div class = "simbolo_carga"></div>' +
     '  </div>' +
     '</div>';
+
+
+    //google.script.run.withSuccessHandler().consultar_indicadores();
+
     
     google.script.run.withSuccessHandler( 
       (Informacion) => {
-        document.getElementById("informacion_indicadores").innerHTML = Informacion.Consulta;
+        document.getElementById("informacion_indicadores").innerHTML = Informacion.tabla_consulta;
 
-        document.getElementById("listado_areas").innerHTML = Informacion.opciones_areas;
-        document.getElementById("listado_unidades").innerHTML = Informacion.opciones_unidades;
-        document.getElementById("listado_equipos").innerHTML = Informacion.opciones_equipos;
-
-        document.getElementById("listado_responsables").innerHTML = Informacion.opciones_responsables;
         document.getElementById("listado_nombres").innerHTML = Informacion.opciones_nombres;
-        document.getElementById("listado_tipos_recursos").innerHTML = Informacion.opciones_tipos_recursos;
+        document.getElementById("listado_correos").innerHTML = Informacion.opciones_correos;
+        document.getElementById("listado_carros").innerHTML = Informacion.opciones_carros;
 
-      }).consultar_indicadores(Informacion);
+      }).consultar_indicadores_drive(Informacion);
   }
 
   function modificar_indicadores(id) {
